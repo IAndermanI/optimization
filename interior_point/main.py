@@ -5,10 +5,13 @@ class Matrix:
         :param matrix: matrix data
         """
         if matrix is None:
-            matrix = [[]]
-        self.n = len(matrix)
-        self.m = len(matrix[0])
-        self.matrix = matrix
+            self.matrix = [[]]
+            self.n = 0
+            self.m = 0
+        else:
+            self.n = len(matrix)
+            self.m = len(matrix[0])
+            self.matrix = matrix
 
     def fromString(self, s, row):
         """
@@ -17,8 +20,11 @@ class Matrix:
         :param row: row number
         :return: matrix
         """
-        self.matrix[row] = [int(i) for i in s.split()]
-        return self
+        if row >= len(self.matrix):
+            self.matrix.append([float(i) for i in s.split()])
+        else:
+            self.matrix[row] = [float(i) for i in s.split()]
+        return Matrix(self.matrix)
 
     def fromStringArray(self, s_arr):
         """
@@ -28,7 +34,7 @@ class Matrix:
         """
         for row, s in enumerate(s_arr):
             self.fromString(s, row)
-        return self
+        return Matrix(self.matrix)
 
     def print(self, *args):
         """
@@ -161,11 +167,14 @@ class Matrix:
 
 class Vector(Matrix):
     def __init__(self, matrix=None):
-        super().__init__(matrix)
         if matrix is None:
-            matrix = [[]]
-        self.n = 1
-        self.m = len(matrix[0])
+            self.matrix = [[]]
+            self.n = 0
+            self.m = 0
+        else:
+            self.matrix = matrix
+            self.n = 1
+            self.m = len(matrix[0])
 
     def norm(self):
         """
@@ -233,9 +242,26 @@ class Interior:
         return x
 
 
-A = Matrix([[2, 4, 1, 0], [1, 3, 0, -1]])
-B = Vector([[16, 9]]).transpose()
-C = Vector([[-1, -1, 0, 0]])
+print("Input the size of matrix of coefficients A")
+
+print("Number of rows n: ")
+n = int(input())
+print("Number of columns m: ")
+m = int(input())
+
+print("Input a matrix of coefficients A (n rows by m columns):")
+A_string = [input() for _ in range(n)]
+
+print("Input a vector of right-hand side numbers B (1 row by n columns):")
+B_string = [input()]
+
+print("Input a vector of coefficients of objective function C (1 row by m columns):")
+C_string = [input()]
+
+
+A = Matrix().fromStringArray(A_string)
+B = Vector().fromStringArray(B_string).transpose()
+C = Vector().fromStringArray(C_string).multiply(-1)
 
 Inter = Interior(A, B, C)
 X = Vector([[0.5, 3.5, 1, 2]]).transpose()
